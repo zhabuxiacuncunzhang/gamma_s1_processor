@@ -204,13 +204,6 @@ def load_config(config_file):
         logger.error(f"加载配置异常：{e}", exc_info=True)
         sys.exit(1)
 
-# 定义排序函数：从文件路径中提取完整时间戳作为排序key
-def get_timestamp_from_path(file_path):
-    """从文件路径中解析完整时间戳（如20201231T225656）"""
-    filename = os.path.basename(file_path)
-    parts = filename.split('_')
-    return parts[5]  # 返回完整时间戳，用于排序
-    
 def step1_plot_kml(config):
     """
     步骤1：绘制所有数据范围图片
@@ -271,11 +264,6 @@ def step1_plot_kml(config):
             if date_str not in date_zip_map:
                 date_zip_map[date_str] = []
             date_zip_map[date_str].append(abs_zip_path)
-
-        # 对每个日期下的文件列表按时间戳排序（不改变字典结构）
-        for date_str in date_zip_map:
-            # 按完整时间戳升序排序（时间从早到晚）
-            date_zip_map[date_str].sort(key=get_timestamp_from_path)
 
         json_file_path = os.path.join(log_root, "date.json")
         try:

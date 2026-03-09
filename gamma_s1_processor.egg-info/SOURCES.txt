@@ -1,0 +1,17 @@
+MANIFEST.in
+README.md
+setup.py
+gamma_s1_processor/__init__.py
+gamma_s1_processor/gamma_s1_processor.py
+gamma_s1_processor.egg-info/PKG-INFO
+gamma_s1_processor.egg-info/SOURCES.txt
+gamma_s1_processor.egg-info/dependency_links.txt
+gamma_s1_processor.egg-info/entry_points.txt
+gamma_s1_processor.egg-info/requires.txt
+gamma_s1_processor.egg-info/top_level.txt
+gamma_s1_processor/s1_auto_bin/__init__.py
+gamma_s1_processor/s1_auto_bin/s1_base.py
+gamma_s1_processor/s1_auto_bin/s1_coregister.py
+gamma_s1_processor/s1_auto_bin/s1_intf.py
+gamma_s1_processor/s1_auto_bin/s1_pair.py
+gamma_s1_processor/s1_auto_bin/s1_process.py

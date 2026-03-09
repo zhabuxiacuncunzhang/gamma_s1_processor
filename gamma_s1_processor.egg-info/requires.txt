@@ -1,0 +1,11 @@
+pyyaml
+matplotlib
+Pillow
+argparse
+glob2
+gdal
+numpy
+pandas
+psutil
+shapely
+scipy

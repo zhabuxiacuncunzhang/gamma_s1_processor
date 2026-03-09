@@ -40,9 +40,9 @@ setup(
         ]
     },
     python_requires=">=3.7",
-    classifiers=[               # 分类标签（PyPI用）
+    classifiers=[
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: MIT License",
-        "Operating System :: Linux",  # GAMMA主要运行在Linux
-    ]
+        "Operating System :: Unix"
+    ],
 )
