@@ -1,0 +1,3 @@
+include README.md
+recursive-include s1_gamma_processor/templates *.yml.template
+recursive-include s1_gamma_processor/s1_auto_bin *.py

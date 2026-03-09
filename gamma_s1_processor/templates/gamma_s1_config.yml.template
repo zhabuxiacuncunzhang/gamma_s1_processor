@@ -1,0 +1,39 @@
+# GAMMA 软件及数据路径配置
+GAMMA_PATH:
+  bin_dir: "/mnt/e/TEMP/S1_auto/s1_auto_bin/"
+  orbit_dir: "/mnt/e/TEMP/S1_auto/orbits/"
+  
+# 处理核心参数
+PROCESSING:
+  rawdata_dir: "/mnt/e/TEMP/S1_auto/rawdata"
+  kml_path: "/mnt/e/TEMP/S1_auto/poly.kml"
+  dem_path: "/mnt/e/TEMP/S1_auto/dem/dem"
+  common_master_date: 20201219
+
+  multilook:
+    range_looks: 10
+    azimuth_looks: 2
+
+  sbas:
+    pairs_file: ''
+    if_winter_only: 
+      option: False
+      winter_start: 11
+      winter_end: 3
+    if_year_pair: 
+      option: False
+      number_of_year: 1
+      baseline_substract: 36
+      baseline_add: 36
+    temp_baseline: 36
+    max_con_ifg: 5
+
+  unwrap:
+    unw_thre: 0.4
+
+  geocode:
+    dem_ovr: 1
+
+# 输出/临时文件配置
+OUTPUT:
+  output_root: "/mnt/e/TEMP/S1_auto/"
