@@ -36,7 +36,7 @@ mamba install gdal
 gamma_s1_processor 会自动在当前目录生成配置文件
 在 templates 文件夹中也有配置文件的模板
 ### 5. 执行方式
-gamma_s1_processor gamma_s1_config.yml start_step end_step
-gamma_s1_processor gamma_s1_config.yml 1 1
-gamma_s1_processor gamma_s1_config.yml 1 5
+gamma_s1_processor gamma_s1_config.yml start_step end_step  
+gamma_s1_processor gamma_s1_config.yml 1 1  
+gamma_s1_processor gamma_s1_config.yml 1 5  
 
