@@ -18,7 +18,7 @@ setup(
     description="Sentinel-1数据GAMMA处理自动化工具",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    #url="https://github.com/yourname/s1-gamma-processor",  # 项目地址
+    url="https://github.com/zhabuxiacuncunzhang/gamma_s1_processor",  # 项目地址
     packages=find_packages(),
     include_package_data=True,  # 包含非代码文件（需配合MANIFEST.in）
     install_requires=[          # 依赖包
