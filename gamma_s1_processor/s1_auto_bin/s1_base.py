@@ -40,6 +40,7 @@ def redirect_stdout_stderr(log_file_path):
             sys.stdout = original_stdout
             sys.stderr = original_stderr
 
+'''
 def plot_relative_baseline_chart(file_path, output_dir, fig_name="baseline_time_plot", dpi=300):
     """
     Plot time-spatial baseline chart based on relative image connections (with center calibration)
@@ -146,6 +147,107 @@ def plot_relative_baseline_chart(file_path, output_dir, fig_name="baseline_time_
         output_path + ".pdf", dpi=dpi, bbox_inches='tight', 
         facecolor='#f8f9fa'  
     )
+    plt.close()
+      
+    return output_path
+'''
+
+def plot_relative_baseline_chart(file_path, output_dir, fig_name="baseline_time_plot", dpi=300):
+    """
+    Plot time-spatial baseline chart based on relative image connections (with center calibration)
+    
+    Parameters:
+    file_path: str - Path to input data file (serial_num date1 date2 baseline_length other columns)
+    output_dir: str - Folder to save the chart
+    fig_name: str - Name of the output chart file
+    dpi: int - Resolution of the chart
+    """
+    # ===================== Step 1: Read and parse data =====================
+    col_names = ["serial_num", "date1", "date2", "baseline_length", "col5", "col6", "col7", "col8", "col9"]
+    df = pd.read_csv(
+        file_path,
+        sep=r'\s+',  # Match any number of spaces
+        header=None,
+        names=col_names,
+        dtype={"date1": str, "date2": str, "baseline_length": float}
+    )
+    
+    # Extract all unique image dates and convert to datetime format
+    all_dates = pd.Series(list(df['date1'].unique()) + list(df['date2'].unique())).unique()
+    date_dt = {date: pd.to_datetime(date, format='%Y%m%d') for date in all_dates}
+    sorted_dates = sorted(all_dates, key=lambda x: date_dt[x])
+    
+    # ===================== Step 2: 循环推导所有日期的位置（解决链式关联问题） =====================
+    base_date = sorted_dates[0]
+    baseline_pos = {base_date: 0.0}
+    
+    # 核心优化：循环直到没有新日期被推导，确保覆盖所有链式关联
+    new_dates_added = True
+    while new_dates_added:
+        new_dates_added = False
+        for _, row in df.iterrows():
+            d1, d2, bl = row['date1'], row['date2'], row['baseline_length']
+            
+            # Case 1: Known d1, derive d2
+            if d1 in baseline_pos and d2 not in baseline_pos:
+                baseline_pos[d2] = baseline_pos[d1] + bl
+                new_dates_added = True
+            # Case 2: Known d2, derive d1 (reverse)
+            elif d2 in baseline_pos and d1 not in baseline_pos:
+                baseline_pos[d1] = baseline_pos[d2] - bl
+                new_dates_added = True
+    
+    # ===================== Step 3: 验证数据（确认无孤立日期，符合你的预期） =====================
+    missing_dates = [date for date in all_dates if date not in baseline_pos]
+    if missing_dates:
+        raise ValueError(f"发现孤立日期（与预期不符）：{missing_dates}\n请检查数据是否存在断链或格式错误！")
+    
+    # ===================== Step 4: Center calibration =====================
+    all_positions = np.array(list(baseline_pos.values()))
+    center_offset = np.median(all_positions)
+    calibrated_pos = {date: pos - center_offset for date, pos in baseline_pos.items()}
+    
+    # ===================== Step 5: Plot the chart =====================
+    plt.figure(figsize=(12, 7))
+    
+    # 此时sorted_dates中的所有日期都在calibrated_pos中，不会再报错
+    dates_dt_list = [date_dt[date] for date in sorted_dates]
+    pos_list = [calibrated_pos[date] for date in sorted_dates]  # 这行现在安全了
+    
+    # 绘制散点
+    plt.scatter(
+        dates_dt_list, pos_list,
+        color='#1f77b4', s=100, marker='o', 
+        label='SAR Image', zorder=5
+    )
+    
+    # 绘制连线
+    for _, row in df.iterrows():
+        d1, d2 = row['date1'], row['date2']
+        x = [date_dt[d1], date_dt[d2]]
+        y = [calibrated_pos[d1], calibrated_pos[d2]]
+        plt.plot(x, y, color='#7f7f7f', linestyle='--', linewidth=1.5, alpha=0.7, zorder=3)
+    
+    # 标注日期
+    for date in sorted_dates:
+        plt.annotate(
+            date, (date_dt[date], calibrated_pos[date]),
+            xytext=(5, 5), textcoords='offset points',
+            fontsize=9, color='black'
+        )
+    
+    # ===================== Step 6: 图表美化与保存 =====================
+    plt.xlabel('Time', fontsize=12, fontweight='bold')
+    plt.ylabel('Perpendicular baseline (m)', fontsize=12, fontweight='bold')
+    plt.grid(True, linestyle='--', alpha=0.6)
+    plt.legend(loc='best', fontsize=10)
+    plt.gcf().autofmt_xdate()
+    
+    # 保存文件
+    os.makedirs(output_dir, exist_ok=True)
+    output_path = os.path.join(output_dir, fig_name)
+    plt.savefig(output_path + ".png", dpi=dpi, bbox_inches='tight', facecolor='#f8f9fa')
+    plt.savefig(output_path + ".pdf", dpi=dpi, bbox_inches='tight', facecolor='#f8f9fa')
     plt.close()
       
     return output_path
