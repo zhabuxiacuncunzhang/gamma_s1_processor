@@ -236,12 +236,11 @@ def calc_base(config, pairs_file, date_keep):
             print(f"========== base_calc 执行日志 ==========\n")
             current_dir = os.getcwd()
             os.chdir(base_dir)  # 切换到日期目录执行，确保输入输出在该目录
-            stat = pg.base_calc(
+            stat = pg.base_plot(
                 SLC_tab = SLC_tab,
                 SLC_par = os.path.join(ifgs_dir, master_date, f"{master_date}.slc.par"), 
                 bperp_file = bperp_file,
                 itab = itab,
-                itab_type = 1,
                 plt_flg = 1,)
             os.chdir(current_dir)  # 恢复原始工作目录
             # 根据返回状态码判断执行结果
