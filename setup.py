@@ -32,7 +32,8 @@ setup(
         "pandas",
         "psutil",
         "shapely",
-        "scipy"
+        "scipy",
+        "sentineleof"
     ],
     entry_points={              # 命令行入口（可选，方便终端调用）
         'console_scripts': [

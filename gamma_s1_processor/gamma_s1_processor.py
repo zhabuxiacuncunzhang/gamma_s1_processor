@@ -247,6 +247,24 @@ def step1_plot_kml(config):
         step1_log_dir = os.path.join(log_root, "step1")
         os.makedirs(step1_log_dir, exist_ok=True)
 
+        orbit_flag = config['GAMMA_PATH']['orbit_update_method']
+        if orbit_flag == "auto":
+            program_cmd = [
+                "eof",
+                "--search-path", raw_data_dir,
+                "--save-dir", orbit_dir,
+                "--force-asf"
+            ]
+            # 直接通过subprocess配置输出重定向和后台运行
+            with open(f"{step1_log_dir}/orbit_update.log", 'a') as log_file:
+                subprocess.Popen(
+                    program_cmd,
+                    stdout=log_file,
+                    stderr=subprocess.STDOUT,  # 把stderr也重定向到日志
+                    shell=False,  # 列表形式命令无需shell=True，更安全
+                    preexec_fn=os.setsid  # 脱离父进程，后台运行
+                )
+
         s1_zip_pattern = os.path.join(raw_data_dir, "S1*_IW_SLC__*.zip")
         s1_zip_files = glob.glob(s1_zip_pattern)
 
@@ -905,6 +923,7 @@ def generate_config():
 # GAMMA 软件及数据路径配置
 GAMMA_PATH:
   bin_dir: "/mnt/e/TEMP/S1_auto/s1_auto_bin/"
+  orbit_update_method: "auto"   # local/auto
   orbit_dir: "/mnt/e/TEMP/S1_auto/orbits/"
   
 # 处理核心参数
