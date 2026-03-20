@@ -32,7 +32,6 @@ from .s1_auto_bin import s1_pair as step4_pair
 from .s1_auto_bin import s1_base as step4_base
 from .s1_auto_bin import s1_intf as step5_intf
 
-
 # ========== 输出重定向上下文管理器 ==========
 @contextmanager
 def redirect_stdout_stderr(log_file_path):
@@ -56,11 +55,11 @@ def redirect_stdout_stderr(log_file_path):
             sys.stdout = original_stdout
             sys.stderr = original_stderr
 
-def setup_logger(config):
+def setup_logger(config, filename = './gamma_s1_process.log', name = 'gamma_s1_processor'):
     """
     配置日志系统：控制台+文件双输出，按大小轮转
     """
-    log_path = config.get('OUTPUT', {}).get('log_path', './gamma_s1_process.log')
+    log_path = config.get('OUTPUT', {}).get('log_path', filename)
     log_dir = os.path.dirname(log_path)
     if not os.path.exists(log_dir):
         os.makedirs(log_dir, exist_ok=True)
@@ -70,7 +69,7 @@ def setup_logger(config):
         datefmt='%Y-%m-%d %H:%M:%S'
     )
     
-    logger = logging.getLogger('gamma_s1_processor')
+    logger = logging.getLogger(name)
     logger.setLevel(logging.DEBUG)
     # 防止重复添加 handler 导致重复日志输出
     if logger.handlers:
@@ -210,7 +209,7 @@ def get_timestamp_from_path(file_path):
     filename = os.path.basename(file_path)
     parts = filename.split('_')
     return parts[5]  # 返回完整时间戳，用于排序
-    
+
 def step1_plot_kml(config):
     """
     步骤1：绘制所有数据范围图片
