@@ -1,0 +1,11 @@
+1. 用GAMMA 2024生成的dem_seg.dem_par文件中，存在
+EPSG:     
+这一行的数值为空，导致
+File "/home/xszhang/software/anaconda3/envs/mintpy/lib/python3.8/site-packages/mintpy/utils/readfile.py", line 1534, in read_gamma_par
+    value = str.replace(c[1], '\n', '').split("#")[0].split()[0].strip()
+解析不出来
+手动填写
+EPSG:     4326
+2. 读取unw数据时，data_type有误
+在中File "/home/xszhang/software/anaconda3/envs/mintpy/lib/python3.8/site-packages/mintpy/utils/readfile.py", line 2009添加
+data_type = '>f4' 
