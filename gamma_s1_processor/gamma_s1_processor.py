@@ -759,7 +759,7 @@ def step3_generate_cropped_map(config):
         log_file_path = os.path.join(step3_log_dir, f"{master_date}_geocode.log")
 
         lt_file = glob.glob(os.path.join(master_dir, f"dem_seg.{master_date}.lt_fine"))
-        if  lt_file:
+        if lt_file:
             logger.info(f"lookup_table_fine → {lt_file[0]}已存在") 
             return  # 主影像已存在，跳过生成步骤
 

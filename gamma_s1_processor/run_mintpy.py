@@ -8,33 +8,10 @@ import logging
 from logging.handlers import RotatingFileHandler
 import glob
 from contextlib import contextmanager
-from gamma_s1_processor import load_config, setup_logger
+from gamma_s1_processor import load_config, setup_logger, redirect_stdout_stderr
 import json
 from pathlib import Path
 import py_gamma as pg
-
-# ========== 输出重定向上下文管理器 ==========
-@contextmanager
-def redirect_stdout_stderr(log_file_path):
-    """
-    临时重定向stdout和stderr到指定文件
-    :param log_file_path: 日志文件路径
-    """
-    # 保存原始的stdout和stderr
-    original_stdout = sys.stdout
-    original_stderr = sys.stderr
-    
-    # 打开日志文件（追加模式，编码utf-8）
-    with open(log_file_path, 'a', encoding='utf-8') as log_file:
-        # 替换stdout和stderr
-        sys.stdout = log_file
-        sys.stderr = log_file
-        try:
-            yield  # 执行被包裹的代码
-        finally:
-            # 恢复原始的stdout和stderr
-            sys.stdout = original_stdout
-            sys.stderr = original_stderr
 
 def create_symlink(src, dst, is_directory=False):
     """
