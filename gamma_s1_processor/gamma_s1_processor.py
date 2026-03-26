@@ -507,7 +507,7 @@ def step2_generate_master_image(config):
             try:
                 current_dir = os.getcwd()
                 os.chdir(date_dir)  # 切换到日期目录执行，确保输入输出在该目录
-                plot_kml.main(files=[kml_path],output="../")
+                plot_kml.main(files=[kml_path],output="./")
                 os.chdir(current_dir)  # 恢复原始工作目录
                 # 根据返回状态码判断执行结果
                 if not os.path.exists(os.path.join(master_dir, target_png_name)):
