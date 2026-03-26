@@ -31,6 +31,7 @@ from .s1_auto_bin import s1_coregister as step4_coreg
 from .s1_auto_bin import s1_pair as step4_pair
 from .s1_auto_bin import s1_base as step4_base
 from .s1_auto_bin import s1_intf as step5_intf
+from .s1_auto_bin import plot_IW_kml_enhance as plot_kml
 
 # ========== 输出重定向上下文管理器 ==========
 @contextmanager
@@ -365,65 +366,16 @@ def step1_plot_kml(config):
                 raise
         
             # 根据kml，利用plot_IW_kml.bash绘制png图片，保存到SLC文件夹中
-            logger.info(f"开始为日期 {date_str} 调用plot_IW_kml.bash生成PNG图片...")
-            # 定义plot_IW_kml的日志文件
-            plot_log_path = os.path.join(step1_log_dir, f"{date_str}_plot_IW_kml.log")
+            logger.info(f"开始为日期 {date_str} 生成PNG图片...")
 
-            original_bash_script = os.path.join(bin_dir, "plot_IW_kml_enhance.bash")
-            # 定义复制到date_dir后的脚本路径
-            copied_bash_script = os.path.join(date_dir, "plot_IW_kml_enhance.bash")
-
-            # 复制bash脚本到日期目录
-            try:
-                if not os.path.exists(original_bash_script):
-                    raise FileNotFoundError(f"原始绘图脚本不存在：{original_bash_script}")
-                
-                # 复制脚本（保留文件权限）
-                shutil.copy2(original_bash_script, copied_bash_script)
-                logger.info(f"日期 {date_str}：已将绘图脚本复制到 {copied_bash_script}")
-                
-                # 给复制后的脚本添加可执行权限（防止原脚本无执行权限）
-                os.chmod(copied_bash_script, 0o755)
-
-            except Exception as e:
-                logger.error(f"日期 {date_str}：复制plot_IW_kml.bash脚本失败：{e}")
-                raise
             # 定义生成的PNG临时名称（脚本默认输出名）和目标名称
-            target_png_name = f"{date_str}.png"            
+            target_png_name = f"{date_str}.png"    
             try:
-                # 调用bash脚本生成PNG
-                with redirect_stdout_stderr(plot_log_path):
-                    print(f"========== {date_str} plot_IW_kml 执行日志 ==========\n")
-                    # 请根据实际情况修改plot_IW_kml.bash的路径
-                    plot_cmd = ["bash", 
-                                "plot_IW_kml_enhance.bash", 
-                                "-f", kml_path,
-                                "-o", "../" ]
-                    
-                    # 执行命令
-                    plot_result = subprocess.run(
-                        plot_cmd,
-                        cwd=date_dir,  # 切换到日期目录执行，确保输出的PNG在该目录
-                        stdout=subprocess.PIPE,
-                        stderr=subprocess.PIPE,
-                        text=True,
-                        encoding='utf-8'
-                    )
-
-                    # 输出命令执行日志
-                    print(f"执行命令：{' '.join(plot_cmd)}")
-                    print(f"返回码：{plot_result.returncode}")
-                    print(f"标准输出：{plot_result.stdout}")
-                    print(f"标准错误：{plot_result.stderr}")
-                    
-                # 检查命令执行结果
-                if plot_result.returncode != 0:
-                    raise RuntimeError(
-                        f"绘图执行失败（返回码：{plot_result.returncode}），"
-                        f"错误信息：{plot_result.stderr[:500]}..."
-                    )
-                    
-                # 检查临时PNG文件是否生成
+                current_dir = os.getcwd()
+                os.chdir(date_dir)  # 切换到日期目录执行，确保输入输出在该目录
+                plot_kml.main(files=[kml_path],output="../")
+                os.chdir(current_dir)  # 恢复原始工作目录
+                # 根据返回状态码判断执行结果
                 if not os.path.exists(os.path.join(slc_dir, target_png_name)):
                     raise FileNotFoundError(f"未生成PNG文件：{target_png_name}")
                 logger.info(f"日期 {date_str}：成功生成PNG文件 → {target_png_name}")                    
@@ -547,65 +499,17 @@ def step2_generate_master_image(config):
                 raise
         
             # 根据kml，利用plot_IW_kml.bash绘制png图片，保存到SLC文件夹中
-            logger.info(f"开始为日期 {master_date} 调用plot_IW_kml.bash生成PNG图片...")
-            # 定义plot_IW_kml的日志文件
-            plot_log_path = os.path.join(step2_log_dir, f"{master_date}_plot_IW_kml.log")
-
-            original_bash_script = os.path.join(bin_dir, "plot_IW_kml_enhance.bash")
-            # 定义复制到date_dir后的脚本路径
-            copied_bash_script = os.path.join(date_dir, "plot_IW_kml_enhance.bash")
+            logger.info(f"开始为日期 {master_date} 生成PNG图片...")
 
             # 复制bash脚本到日期目录
+            target_png_name = f"{master_date}.png"
+            
             try:
-                if not os.path.exists(original_bash_script):
-                    raise FileNotFoundError(f"原始绘图脚本不存在：{original_bash_script}")
-                
-                # 复制脚本（保留文件权限）
-                shutil.copy2(original_bash_script, copied_bash_script)
-                logger.info(f"日期 {master_date}：已将绘图脚本复制到 {copied_bash_script}")
-                
-                # 给复制后的脚本添加可执行权限（防止原脚本无执行权限）
-                os.chmod(copied_bash_script, 0o755)
-
-            except Exception as e:
-                logger.error(f"日期 {master_date}：复制plot_IW_kml.bash脚本失败：{e}")
-                raise
-            # 定义生成的PNG临时名称（脚本默认输出名）和目标名称
-            target_png_name = f"{master_date}.png"            
-            try:
-                # 调用bash脚本生成PNG
-                with redirect_stdout_stderr(plot_log_path):
-                    print(f"========== {master_date} plot_IW_kml 执行日志 ==========\n")
-                    # 请根据实际情况修改plot_IW_kml.bash的路径
-                    plot_cmd = ["bash", 
-                                "plot_IW_kml_enhance.bash", 
-                                "-f", kml_path,
-                                "-o", "./" ]
-                    
-                    # 执行命令
-                    plot_result = subprocess.run(
-                        plot_cmd,
-                        cwd=date_dir,  # 切换到日期目录执行，确保输出的PNG在该目录
-                        stdout=subprocess.PIPE,
-                        stderr=subprocess.PIPE,
-                        text=True,
-                        encoding='utf-8'
-                    )
-
-                    # 输出命令执行日志
-                    print(f"执行命令：{' '.join(plot_cmd)}")
-                    print(f"返回码：{plot_result.returncode}")
-                    print(f"标准输出：{plot_result.stdout}")
-                    print(f"标准错误：{plot_result.stderr}")
-                    
-                # 检查命令执行结果
-                if plot_result.returncode != 0:
-                    raise RuntimeError(
-                        f"绘图执行失败（返回码：{plot_result.returncode}），"
-                        f"错误信息：{plot_result.stderr[:500]}..."
-                    )
-                    
-                # 检查临时PNG文件是否生成
+                current_dir = os.getcwd()
+                os.chdir(date_dir)  # 切换到日期目录执行，确保输入输出在该目录
+                plot_kml.main(files=[kml_path],output="../")
+                os.chdir(current_dir)  # 恢复原始工作目录
+                # 根据返回状态码判断执行结果
                 if not os.path.exists(os.path.join(master_dir, target_png_name)):
                     raise FileNotFoundError(f"未生成PNG文件：{target_png_name}")
                 logger.info(f"日期 {master_date}：成功生成PNG文件 → {target_png_name}")                    
@@ -616,7 +520,6 @@ def step2_generate_master_image(config):
                 logger.error(f"日期 {master_date}：绘图时出错：{e}")
                 raise
             
-
             ## SLC_mosaic_ScanSAR
             logger.info(f"mosaic {master_date} 影像...")
             try:

@@ -33,7 +33,8 @@ setup(
         "psutil",
         "shapely",
         "scipy",
-        "sentineleof"
+        "sentineleof",
+        "cartopy"
     ],
     entry_points={              # 命令行入口（可选，方便终端调用）
         'console_scripts': [

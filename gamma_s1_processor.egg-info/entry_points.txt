@@ -1,2 +1,0 @@
-[console_scripts]
-gamma_s1_processor = gamma_s1_processor:main
